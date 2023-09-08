@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check_formatting:
+    name: Ensure Code is Formatted
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: erlef/setup-beam@v1.9.0
+        with:
+          elixir-version: '1.12'
+          otp-version: '24'
+      - run: mix format --check-formatted
+  build:
+    name: Build and test
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        include:
+          - elixir-version: '1.12'
+            otp-version: '24'
+    env:
+      MIX_ENV: test
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v2
+
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1.9.0
+      with:
+        elixir-version: ${{ matrix.elixir-version }}
+        otp-version: ${{ matrix.otp-version }}
+
+    - name: Restore dependencies cache
+      uses: actions/cache@v2
+      with:
+        path: deps
+        key: ${{ runner.os }}-${{ matrix.elixir-version }}-${{ matrix.otp-version }}-mix-${{ hashFiles('**/mix.lock') }}
+        restore-keys: ${{ runner.os }}-${{ matrix.elixir-version }}-${{ matrix.otp-version }}-mix-
+
+    - name: Install dependencies
+      run: mix deps.get
+
+    - name: Compile code
+      run: mix compile --warnings-as-errors
+
+    - name: Run tests
+      run: mix test
