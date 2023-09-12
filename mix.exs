@@ -8,6 +8,7 @@ defmodule MemorySize.MixProject do
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      package: package(),
       docs: [
         main: "MemorySize"
       ]
@@ -30,8 +31,8 @@ defmodule MemorySize.MixProject do
       maintainers: ["Discord Realtime Infrastructure"],
       licenses: ["MIT"],
       links: %{
-        "GitHub" => "https://github.com/discord/memory_size",
-      },
+        "GitHub" => "https://github.com/discord/memory_size"
+      }
     ]
   end
 end
